@@ -17,7 +17,7 @@ def list_teachers(db: Session = Depends(get_db)):
     return db.query(models.Teacher).order_by(models.Teacher.id.asc()).all()
 
 @router.get("/{teacher_id}", response_model=schemas.TeacherOut)
-def get_teachers( teacher_id:int, db: Session = Depends(get_db)):
+def get_teacher( teacher_id:int, db: Session = Depends(get_db)):
     teacher = db.query(models.Teacher).filter(models.Teacher.id == teacher_id).first()
     if not teacher:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher not found")
@@ -46,3 +46,10 @@ def delete_teacher(teacher_id: int, db: Session = Depends(get_db)):
     db.delete(teacher)
     db.commit()
     return None
+
+@router.get("/{teacher_id}/philosophy/responses", response_model=list[schemas.PhilosophyResponseOut])
+def get_teacher_responses(teacher_id: int, db: Session = Depends(get_db)):
+    q = db.query(models.Teacher).filter(models.Teacher.id == teacher_id).first()
+    if not q:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher not found")
+    return q.responses
